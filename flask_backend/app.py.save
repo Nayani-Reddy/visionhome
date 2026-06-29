@@ -1,0 +1,138 @@
+from flask import Flask, request, jsonify, send_file, abort
+from flask_cors import CORS
+import os
+import re
+from pathlib import Path
+from rembg import remove
+
+# Paths
+PROJECT_ROOT = Path(__file__).resolve().parent
+DATASETS_DIR = PROJECT_ROOT / "datasets"
+TMP_DIR = PROJECT_ROOT / "flask_backend_tmp"
+
+# Allowed extensions
+ALLOWED_EXT = [".jpg", ".jpeg", ".png"]
+
+# Make tmp folder
+os.makedirs(TMP_DIR, exist_ok=True)
+
+# Flask app
+app = Flask(__name__)
+CORS(app)
+
+# Helper functions
+def sanitize_token(tok):
+    """Lowercase and remove unwanted characters"""
+    return re.sub(r'[^a-z0-9]', '', tok.lower())
+
+def filename_to_tags(fname):
+    """Generate tags from filename"""
+    base = Path(fname).name
+    name, _ = os.path.splitext(base)
+    s = re.sub(r'[-\s]+', '-', name)
+    parts = re.split(r'[_|\W]+', s)
+    tags = []
+    for p in parts:
+        tok = sanitize_token(p)
+        if not tok or tok.isdigit() or len(tok) < 2:
+            continue
+        tags.append(tok)
+    return list(dict.fromkeys(tags))
+
+def build_index():
+    """Scan datasets and build a dictionary: {relative_path: tags}"""
+    index = {}
+    if not DATASETS_DIR.exists():
+        return index
+    for root, _, files in os.walk(DATASETS_DIR):
+        for f in files:
+            if Path(f).suffix.lower() not in ALLOWED_EXT:
+                continue
+            abs_path = Path(root) / f
+            rel_path = abs_path.relative_to(DATASETS_DIR)
+            index[str(rel_path)] = filename_to_tags(f)
+    return index
+
+TAGS_INDEX = build_index()
+
+# Routes
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok", "count": len(TAGS_INDEX)})
+
+@app.route("/tags")
+def tags():
+    return jsonify(TAGS_INDEX)
+
+@app.route("/recommend", methods=["POST"])
+def recommend():
+    data = request.get_json(force=True) or {}
+    q = (data.get("q") or "*").strip().lower()
+    if not q or q == "*":
+        return jsonify({"results": []})
+
+    tokens = [sanitize_token(p) for p in q.split()]
+    scores = []
+
+    for rel, tags in TAGS_INDEX.items():
+        score = 0
+        for t in tokens:
+            if t in tags:
+                score += 3
+        if score > 0:
+            scores.append((rel, score))
+
+    scores.sort(key=lambda x: x[1], reverse=True)
+    results = [str(r[0]) for r in scores[:5]]  # top 5
+    return jsonify({"results": results})
+
+@app.route("/image/<path:filename>")
+def serve_image(filename):
+    requested = Path(filename)
+    abs_path = DATASETS_DIR / requested
+    try:
+        abs_path.relative_to(DATASETS_DIR)
+    except Exception:
+        abort(404)
+    if not abs_path.exists() or not abs_path.is_file():
+        abort(404)
+    return send_file(str(abs_path), conditional=True)
+
+@app.route("/prepare", methods=["POST"])
+def prepare():
+    """Remove background and return processed image"""
+    data = request.get_json(force=True) or {}
+    filename = data.get("filename")
+    if not filename:
+        return jsonify({"error": "filename missing"}), 400
+
+    requested = Path(filename)
+    abs_path = DATASETS_DIR / requested
+    try:
+        abs_path.relative_to(DATASETS_DIR)
+    except Exception:
+        return jsonify({"error": "not found"}), 404
+
+    if not abs_path.exists() or not abs_path.is_file():
+        return jsonify({"error": "not found"}), 404
+
+    # Read file and remove background
+    with open(abs_path, "rb") as f:
+        inp = f.read()
+    try:
+        out_bytes = remove(inp)
+    except Exception as e:
+        return jsonify({"error": f"background removal failed: {str(e)}"}), 500
+
+    # Save to TMP_DIR
+    safe_name = re.sub(r'[^a-zA-Z0-9._-]', '_', requested.name)
+    out_path = TMP_DIR / safe_name
+    with open(out_path, "wb") as f:
+        f.write(out_bytes)
+
+    return send_file(str(out_path), conditional=True)
+
+# Run app
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=6000, debug=True)
+

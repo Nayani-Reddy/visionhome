@@ -1,0 +1,8 @@
+flask
+flask-cors
+rembg
+Pillow
+tensorflow
+scikit-learn
+opencv-python-headless
+numpy

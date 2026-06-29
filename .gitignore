@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+bower_components/
+
+# Python Virtual Environments
+venv/
+.venv/
+venv copy/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS Metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Large Files & ML Assets
+datasets/
+*.zip
+*.pkl
+*.h5
+flask_backend_tmp/
+tmp/
+frontend/tmp/

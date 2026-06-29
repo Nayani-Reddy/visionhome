@@ -1,0 +1,17 @@
+import os
+import shutil
+
+# Path to your dataset images
+source_folder = "furniture-detector/img"  # <-- update if your images are somewhere else
+# Destination folder in frontend
+
+
+dest_folder = "frontend/assets/furniture"
+
+# Make sure destination exists
+os.makedirs(dest_folder, exist_ok=True)
+
+# Copy all files
+for root, dirs, files in os.walk(source_folder):
+    for file in files:
+        if file.lower().e

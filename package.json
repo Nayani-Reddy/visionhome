@@ -1,0 +1,24 @@
+{
+  "name": "visionhome",
+  "version": "1.0.0",
+  "description": "A project that allows users to design their home interiors using AI-generated furniture placements.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.ts",
+    "build": "tsc",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "cors": "^2.8.5",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.2",
+    "@types/node": "^14.14.31",
+    "@types/express": "^4.17.8"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
