@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisionHome – Advanced AI Interior Design</title>
+    <title>VisionHome – Machine Learning Interior Design & Recommendation System</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
     <div class="container">
         <header>
             <h1>VisionHome</h1>
-            <p>Reimagine your space with advanced AI-powered controls.</p>
+            <p>Reimagine your space with multi-parameter Machine Learning furniture recommendations.</p>
             <div style="margin-top: 1rem;">
                 <button class="btn" style="margin: 0 auto;" onclick="exportDesign()">
                     <span>📥</span> Export Design
@@ -28,30 +28,28 @@
         <div class="controls">
             <div class="controls-group">
                 <label for="uploadRoom" class="btn btn-secondary">
-                    <span>📁</span> Room
+                    <span>📁</span> Room Photo
                     <input type="file" id="uploadRoom" style="display: none;">
                 </label>
             </div>
 
             <div class="controls-group">
-                <button type="button" class="btn btn-secondary" onclick="addWallPanel()"><span>🧱</span> Add
-                    Wall</button>
+                <button type="button" class="btn btn-secondary" onclick="addWallPanel()"><span>🧱</span> Add Wall</button>
             </div>
 
+            <!-- Mode 1: ML Recommendations Search Query Input -->
             <div class="controls-group">
-                <input type="text" id="desc" placeholder="Search (e.g., 'sofa')">
-                <button type="button" class="btn" onclick="getFurniture()"><span>🔍</span> Find</button>
+                <span style="font-size: 0.8rem; font-weight: 600; color: #666; margin-right: 2px;">ML Search:</span>
+                <input type="text" id="desc" placeholder="Search & ML Rank (e.g., 'sofa', 'chair')">
+                <button type="button" class="btn" onclick="getFurniture()"><span>🔍</span> Search & ML Rank</button>
             </div>
 
             <div class="controls-group">
                 <div class="lighting-options">
                     <button type="button" class="light-btn active" onclick="setLighting('none', this)">Daylight</button>
-                    <button type="button" class="light-btn"
-                        onclick="setLighting('rgba(255, 200, 100, 0.3)', this)">Sunset</button>
-                    <button type="button" class="light-btn"
-                        onclick="setLighting('rgba(100, 150, 255, 0.2)', this)">Moon</button>
-                    <button type="button" class="light-btn"
-                        onclick="setLighting('rgba(255, 100, 100, 0.1)', this)">Warm</button>
+                    <button type="button" class="light-btn" onclick="setLighting('rgba(255, 200, 100, 0.3)', this)">Sunset</button>
+                    <button type="button" class="light-btn" onclick="setLighting('rgba(100, 150, 255, 0.2)', this)">Moon</button>
+                    <button type="button" class="light-btn" onclick="setLighting('rgba(255, 100, 100, 0.1)', this)">Warm</button>
                 </div>
             </div>
 
@@ -61,36 +59,27 @@
         <div class="main-layout">
             <aside class="sidebar">
                 <div class="tabs">
-                    <div class="tab active" id="tab-search" onclick="switchTab('search')">Search & AI</div>
+                    <div class="tab active" id="tab-search" onclick="switchTab('search')">Catalog & ML Recommendations</div>
                     <div class="tab" id="tab-favorites" onclick="switchTab('favorites')">Favorites</div>
                 </div>
 
                 <div id="search-section">
-                    <h3>Recommendations</h3>
+                    <h3>Machine Learning Recommendations</h3>
 
-                    <div id="ai-controls-wrapper" style="display: none;">
-                        <button type="button" class="btn btn-secondary" onclick="refreshAISuggestions()"
+                    <!-- Mode 2: AI Recommendations (Room Upload) Refresh Button -->
+                    <div id="ai-controls-wrapper" style="display: none; margin-bottom: 15px;">
+                        <button type="button" class="btn btn-secondary" onclick="refreshAIRecommendations()"
                             id="refresh-ai-btn" style="width: 100%; margin-bottom: 10px;">
-                            <span>🔄</span> Refresh AI Suggestions
+                            <span>🔄</span> Refresh AI Recommendations
                         </button>
-
-                        <div class="slider-container"
-                            style="margin-bottom: 15px; padding: 12px; background: rgba(108, 92, 231, 0.08); border-radius: 8px; border: 1px solid rgba(108, 92, 231, 0.2);">
-                            <label for="colorStyleSlider"
-                                style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: #4a4a4a;">
-                                <span>🎨 Color Focus</span> <span>Style Focus 🛋️</span>
-                            </label>
-                            <input type="range" id="colorStyleSlider" min="0" max="1" step="0.1" value="0.5"
-                                style="width: 100%; cursor: pointer;" oninput="refreshAISuggestions()">
-                        </div>
                     </div>
 
                     <div id="personalized-message"
-                        style="display: none; padding: 10px; background: rgba(0, 184, 148, 0.1); border-left: 4px solid #00b894; margin-bottom: 15px; font-size: 0.9rem; font-weight: 600; color: #2d3436; border-radius: 0 4px 4px 0;">
+                        style="display: none; padding: 10px; background: rgba(0, 184, 148, 0.1); border-left: 4px solid #00b894; margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #2d3436; border-radius: 0 4px 4px 0;">
                     </div>
 
                     <div id="suggestions">
-                        <p class="placeholder-text">Search for furniture or upload a room for AI suggestions.</p>
+                        <p class="placeholder-text">Upload a room photo to trigger automatic AI recommendations or search for furniture to apply ML candidate ranking.</p>
                     </div>
                 </div>
 
@@ -113,12 +102,11 @@
 
                 <div class="slider-controls">
                     <h3>Design Reveal</h3>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Slide to compare empty room vs
-                        your design.</p>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Slide to compare empty room vs your design.</p>
                     <input type="range" min="0" max="100" value="100" class="comparison-slider" id="opacitySlider">
                 </div>
 
-                <!-- Contextual Panel -->
+                <!-- Contextual Edit Panel -->
                 <div id="contextual-panel" class="contextual-panel" style="display: none;">
                     <div class="panel-header">
                         <h3>Item Properties</h3>
@@ -142,10 +130,8 @@
                         </div>
 
                         <div style="display: flex; gap: 10px; margin-top: 15px;">
-                            <button class="btn btn-secondary" style="flex:1; padding: 0.5rem;"
-                                onclick="changeItemLayer(1)">Bring Forward</button>
-                            <button class="btn btn-secondary" style="flex:1; padding: 0.5rem;"
-                                onclick="changeItemLayer(-1)">Send Backward</button>
+                            <button class="btn btn-secondary" style="flex:1; padding: 0.5rem;" onclick="changeItemLayer(1)">Bring Forward</button>
+                            <button class="btn btn-secondary" style="flex:1; padding: 0.5rem;" onclick="changeItemLayer(-1)">Send Backward</button>
                         </div>
                         <button class="btn" style="background:#ff4757; width: 100%; margin-top: 15px; padding: 0.5rem;"
                             onclick="deleteCurrentItem()">Delete Item</button>
@@ -189,69 +175,128 @@
                 </div>
 
                 <div style="margin-top: 1rem; text-align: center; color: #666; font-size: 0.9rem;">
-                    Tip: Click an item to select. Edit using the floating panel.
+                    Tip: Click an item to select. Edit using the floating property panel.
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Explainable AI Modal -->
+    <!-- Detailed ML Recommendation Score Breakdown Modal -->
     <div class="modal-overlay" id="xaiModal">
-        <div class="modal" style="text-align: left;">
-            <h2 style="margin-bottom: 5px;">🧠 Why this is recommended?</h2>
+        <div class="modal" style="text-align: left; max-width: 480px;">
+            <h2 style="margin-bottom: 4px; font-size: 1.3rem;">📊 ML Recommendation Breakdown</h2>
+            <p style="margin-bottom: 15px; font-size: 0.82rem; color: #666;">Multi-Parameter Machine Learning Evaluation System Scores:</p>
 
-            <div style="margin: 20px 0;">
-                <div style="margin-bottom: 10px;">
-                    <div
-                        style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px;">
-                        <span>Visual Similarity:</span>
-                        <span id="xai-vis">0%</span>
+            <div style="margin: 15px 0;">
+                <!-- 1. Visual Feature Similarity (40%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Visual Feature Similarity (ResNet50 40%):</span>
+                        <span id="xai-vis">0.00</span>
                     </div>
-                    <div style="width: 100%; background: #eee; height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div id="xai-vis-bar"
-                            style="height: 100%; background: #6c5ce7; width: 0%; transition: width 0.5s;"></div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-vis-bar" style="height: 100%; background: #6c5ce7; width: 0%; transition: width 0.4s;"></div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <div
-                        style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px;">
-                        <span>Style Match:</span>
-                        <span id="xai-style">0%</span>
+                <!-- 2. Color Compatibility (15%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Color Compatibility (K-Means 15%):</span>
+                        <span id="xai-color">0.00</span>
                     </div>
-                    <div style="width: 100%; background: #eee; height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div id="xai-style-bar"
-                            style="height: 100%; background: #00b894; width: 0%; transition: width 0.5s;"></div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-color-bar" style="height: 100%; background: #e17055; width: 0%; transition: width 0.4s;"></div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <div
-                        style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px;">
-                        <span>Color Compatibility:</span>
-                        <span id="xai-color">0%</span>
+                <!-- 3. Color Distribution Similarity (10%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Color Distribution Similarity (HSV Hist 10%):</span>
+                        <span id="xai-coldist">0.00</span>
                     </div>
-                    <div style="width: 100%; background: #eee; height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div id="xai-color-bar"
-                            style="height: 100%; background: #e17055; width: 0%; transition: width 0.5s;"></div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-coldist-bar" style="height: 100%; background: #00b894; width: 0%; transition: width 0.4s;"></div>
                     </div>
+                </div>
+
+                <!-- 4. Brightness Compatibility (10%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Brightness Compatibility (10%):</span>
+                        <span id="xai-bright">0.00</span>
+                    </div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-bright-bar" style="height: 100%; background: #fdcb6e; width: 0%; transition: width 0.4s;"></div>
+                    </div>
+                </div>
+
+                <!-- 5. Texture Similarity (10%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Texture Similarity (LBP 10%):</span>
+                        <span id="xai-texture">0.00</span>
+                    </div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-texture-bar" style="height: 100%; background: #e84393; width: 0%; transition: width 0.4s;"></div>
+                    </div>
+                </div>
+
+                <!-- 6. Shape/Edge Similarity (5%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Shape/Edge Similarity (Canny 5%):</span>
+                        <span id="xai-shape">0.00</span>
+                    </div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-shape-bar" style="height: 100%; background: #0984e3; width: 0%; transition: width 0.4s;"></div>
+                    </div>
+                </div>
+
+                <!-- 7. Category Relevance (5%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Category Relevance (5%):</span>
+                        <span id="xai-category">0.00</span>
+                    </div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-category-bar" style="height: 100%; background: #636e72; width: 0%; transition: width 0.4s;"></div>
+                    </div>
+                </div>
+
+                <!-- 8. Visual Style Similarity (5%) -->
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: bold; margin-bottom: 2px;">
+                        <span>Visual Style Similarity (5%):</span>
+                        <span id="xai-style">0.00</span>
+                    </div>
+                    <div style="width: 100%; background: #eee; height: 7px; border-radius: 4px; overflow: hidden;">
+                        <div id="xai-style-bar" style="height: 100%; background: #a29bfe; width: 0%; transition: width 0.4s;"></div>
+                    </div>
+                </div>
+
+                <!-- Final Weighted Recommendation Score -->
+                <div style="margin-top: 14px; padding-top: 8px; border-top: 2px dashed #dfe6e9; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.95rem; font-weight: 800; color: #2d3436;">Weighted Recommendation Score:</span>
+                    <span id="xai-final" style="font-size: 1.25rem; font-weight: 800; color: #00b894;">0.00</span>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px;">
-                <button class="btn" style="flex: 1;" onclick="applyXaiItem()">Apply to Room</button>
-                <button class="btn btn-secondary" style="flex: 1;" onclick="closeXaiModal()">Cancel</button>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn" style="flex: 1;" onclick="applyXaiItem()">Place in Room</button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeXaiModal()">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Step-by-Step UI Flow -->
+    <!-- Background Removal Placement Pipeline Flow Modal -->
     <div class="modal-overlay" id="loadingFlowModal">
         <div class="modal">
-            <h2 style="margin-bottom: 15px;">🤖 AI Processing Pipeline</h2>
-            <div id="flow-msg-1" style="color: #6c5ce7; font-weight: bold; margin: 10px 0;">⏳ Analyzing object...</div>
-            <div id="flow-msg-2" style="color: #aaa; margin: 10px 0;">⏳ Removing background using AI model...</div>
-            <div id="flow-msg-3" style="color: #aaa; margin: 10px 0;">⏳ Optimizing placement...</div>
+            <h2 style="margin-bottom: 15px; font-size: 1.3rem;">🖼️ Furniture Processing Pipeline</h2>
+            <div id="flow-msg-1" style="color: #6c5ce7; font-weight: bold; margin: 10px 0;">⏳ Analyzing furniture object...</div>
+            <div id="flow-msg-2" style="color: #aaa; margin: 10px 0;">⏳ Removing background using U²-Net model...</div>
+            <div id="flow-msg-3" style="color: #aaa; margin: 10px 0;">⏳ Preparing canvas placement...</div>
             <button id="flow-place-btn" class="btn" style="width: 100%; margin-top: 15px; display: none;"
                 onclick="finishAiFlow()">Place in Room</button>
         </div>
@@ -265,15 +310,14 @@
         const favoritesBox = document.getElementById("favorites-list");
         const mainLoader = document.getElementById("main-loader");
         const lightingOverlay = document.getElementById("lighting-overlay");
-        const confirmModal = document.getElementById("confirmModal");
         const opacitySlider = document.getElementById("opacitySlider");
 
         let selectedItem = null;
         let favorites = JSON.parse(localStorage.getItem("visionhome_favorites") || "[]");
-        let pendingUrl = null;
         let currentRoomFile = null;
+        let lastItemScoreMap = {};
 
-        // Room Upload
+        // Mode 2: Room Photo Upload (Triggers AI Recommendations)
         document.getElementById("uploadRoom").onchange = function (e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -291,19 +335,19 @@
             fetchAIRecommendations();
         };
 
+        // Mode 2: Fetch AI Recommendations (Room Upload without Search)
         function fetchAIRecommendations() {
             if (!currentRoomFile) return;
 
             document.getElementById("ai-controls-wrapper").style.display = "block";
             document.getElementById("personalized-message").style.display = "none";
             mainLoader.style.display = "inline-block";
-            suggestionsBox.innerHTML = '<p class="placeholder-text" style="color: #6c5ce7; font-weight: bold;"><span>✨</span> Analyzing your room using AI...</p>';
+            suggestionsBox.innerHTML = '<p class="placeholder-text" style="color: #6c5ce7; font-weight: bold;"><span>✨</span> Analyzing room image & generating AI recommendations...</p>';
 
             switchTab('search');
 
             const formData = new FormData();
             formData.append("room_image", currentRoomFile);
-            formData.append("color_weight", document.getElementById("colorStyleSlider").value);
 
             fetch("http://127.0.0.1:5050/ai-recommend", {
                 method: "POST",
@@ -320,57 +364,24 @@
                     renderGroups(data.groups);
                 })
                 .catch(err => {
-                    console.error("AI Recommendation error:", err);
+                    console.error("AI Recommendation fetch error:", err);
                     mainLoader.style.display = "none";
-                    suggestionsBox.innerHTML = "<p class='placeholder-text' style='color: red;'>Error fetching AI recommendations.</p>";
+                    suggestionsBox.innerHTML = "<p class='placeholder-text' style='color: red;'>Error connecting to backend server (Port 5050).</p>";
                 });
         }
 
-        function renderGroups(groupsData) {
-            suggestionsBox.innerHTML = "";
-            if (!groupsData || Object.keys(groupsData).length === 0) {
-                suggestionsBox.innerHTML = "<p class='placeholder-text'>No items found.</p>";
-                return;
-            }
-
-            for (const [groupName, items] of Object.entries(groupsData)) {
-                if (items.length === 0) continue;
-
-                const groupHeader = document.createElement("h4");
-                groupHeader.innerText = groupName;
-                groupHeader.style.marginTop = "20px";
-                groupHeader.style.marginBottom = "10px";
-                groupHeader.style.color = "#2d3436";
-                groupHeader.style.paddingBottom = "5px";
-                groupHeader.style.borderBottom = "1px solid #dfe6e9";
-                suggestionsBox.appendChild(groupHeader);
-
-                const grid = document.createElement("div");
-                renderResults(items, grid, true);
-                suggestionsBox.appendChild(grid);
-            }
-        }
-
-        function refreshAISuggestions() {
+        // Refresh AI Recommendations Button Trigger
+        function refreshAIRecommendations() {
             fetchAIRecommendations();
         }
 
-        // Comparison Slider Logic
-        opacitySlider.oninput = function () {
-            const val = this.value / 100;
-            document.querySelectorAll(".furniture-item").forEach(item => {
-                item.style.opacity = val;
-            });
-            lightingOverlay.style.opacity = val;
-        };
-
-        // Search Recommendations
+        // Mode 1: ML Recommendations (Search Query Candidate Filtering + ML Ranking)
         function getFurniture() {
             const text = document.getElementById("desc").value.trim();
-            if (!text) return alert("Please enter a search term.");
+            if (!text) return alert("Please enter a search query term (e.g., 'sofa', 'chair').");
 
             mainLoader.style.display = "inline-block";
-            suggestionsBox.innerHTML = '<p class="placeholder-text">Searching...</p>';
+            suggestionsBox.innerHTML = '<p class="placeholder-text">Filtering candidates & applying ML recommendation ranking...</p>';
 
             fetch("http://127.0.0.1:5050/recommend", {
                 method: "POST",
@@ -383,12 +394,69 @@
                     renderGroups(data.groups);
                 })
                 .catch(err => {
-                    console.error("Recommendation fetch error:", err);
+                    console.error("ML Search error:", err);
                     mainLoader.style.display = "none";
-                    suggestionsBox.innerHTML = "<p class='placeholder-text' style='color: red;'>Error fetching recommendations. Make sure the backend is running on port 5050.</p>";
+                    suggestionsBox.innerHTML = "<p class='placeholder-text' style='color: red;'>Error fetching ML search results from server.</p>";
                 });
         }
 
+        // Render Categorized Recommendation Groups
+        function renderGroups(groupsData) {
+            suggestionsBox.innerHTML = "";
+            if (!groupsData || Object.keys(groupsData).length === 0) {
+                suggestionsBox.innerHTML = "<p class='placeholder-text'>No items found.</p>";
+                return;
+            }
+
+            for (const [groupName, items] of Object.entries(groupsData)) {
+                if (items.length === 0) continue;
+
+                const groupHeader = document.createElement("h4");
+                groupHeader.innerText = groupName;
+                groupHeader.style.marginTop = "18px";
+                groupHeader.style.marginBottom = "10px";
+                groupHeader.style.color = "#2d3436";
+                groupHeader.style.paddingBottom = "4px";
+                groupHeader.style.borderBottom = "1px solid #dfe6e9";
+                groupHeader.style.fontSize = "0.95rem";
+                suggestionsBox.appendChild(groupHeader);
+
+                const grid = document.createElement("div");
+                grid.className = "suggestions-grid";
+                renderResults(items, grid, true);
+                suggestionsBox.appendChild(grid);
+            }
+
+            // Append the XAI Explanation Section
+            const xaiSection = document.createElement("div");
+            xaiSection.style.marginTop = "3rem";
+            xaiSection.style.padding = "1.5rem";
+            xaiSection.style.background = "rgba(255, 255, 255, 0.5)";
+            xaiSection.style.borderRadius = "16px";
+            xaiSection.style.border = "1px solid rgba(0, 0, 0, 0.05)";
+            xaiSection.innerHTML = `
+                <h4 style="margin-bottom: 12px; color: #2d3436; font-size: 1.1rem;">🤖 XAI — Explainable Recommendations</h4>
+                <p style="font-size: 0.85rem; color: #636e72; line-height: 1.6;">
+                    <strong>The Process:</strong><br>
+                    Room Image <span style="color:#a29bfe">→</span> ResNet50 Feature Extraction <span style="color:#a29bfe">→</span> K-Means Color Analysis <span style="color:#a29bfe">→</span> Color/Brightness/Texture/Shape Features <span style="color:#a29bfe">→</span> Parameter Scoring <span style="color:#a29bfe">→</span> Weighted Recommendation Score <span style="color:#a29bfe">→</span> Furniture Ranking
+                </p>
+                <p style="font-size: 0.8rem; color: #b2bec3; margin-top: 10px;">
+                    Click "Why Recommended?" on any item to view its exact calculated parameter scores.
+                </p>
+            `;
+            suggestionsBox.appendChild(xaiSection);
+        }
+
+        // Comparison Slider Logic
+        opacitySlider.oninput = function () {
+            const val = this.value / 100;
+            document.querySelectorAll(".furniture-item").forEach(item => {
+                item.style.opacity = val;
+            });
+            lightingOverlay.style.opacity = val;
+        };
+
+        // Clean & Sleek Furniture Recommendation Card Renderer
         function renderResults(results, container, isGroup = false) {
             if (!isGroup) container.innerHTML = "";
             if (!results || results.length === 0) {
@@ -396,37 +464,79 @@
                 return;
             }
 
+            const renderedPaths = new Set(); // Deduplication set
+
             results.forEach(obj => {
                 const relPath = typeof obj === 'string' ? obj : obj.item;
+                
+                // Deduplicate items in the same section
+                if (renderedPaths.has(relPath)) return;
+                renderedPaths.add(relPath);
+
                 const explanation = typeof obj === 'string' ? "Saved to favorites." : obj.explanation;
                 const badge = typeof obj === 'string' ? null : obj.badge;
-                const final_score = typeof obj === 'string' ? null : obj.final_score;
+                const final_score = typeof obj === 'object' && obj.final_score !== undefined ? obj.final_score : null;
+                const category = typeof obj === 'object' && obj.category ? obj.category : null;
+
+                if (typeof obj === 'object') {
+                    lastItemScoreMap[relPath] = obj;
+                }
 
                 const itemWrap = document.createElement("div");
-                itemWrap.className = "furniture-img-container";
+                itemWrap.className = "furniture-card";
                 itemWrap.style.display = "flex";
                 itemWrap.style.flexDirection = "column";
                 itemWrap.style.marginBottom = "15px";
+                itemWrap.style.borderRadius = "12px";
+                itemWrap.style.overflow = "hidden";
+                itemWrap.style.background = "#ffffff";
+                itemWrap.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+                itemWrap.style.border = "1px solid #f0f0f0";
+                itemWrap.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
+
+                itemWrap.onmouseenter = () => {
+                    itemWrap.style.transform = "translateY(-4px)";
+                    itemWrap.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
+                };
+                itemWrap.onmouseleave = () => {
+                    itemWrap.style.transform = "translateY(0)";
+                    itemWrap.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+                };
 
                 const imgContainer = document.createElement("div");
                 imgContainer.style.position = "relative";
                 imgContainer.style.cursor = "pointer";
+                imgContainer.style.background = "#f8f9fa";
+                imgContainer.style.padding = "10px";
 
                 const img = document.createElement("img");
                 img.className = "suggestion-img";
                 img.src = `http://127.0.0.1:5050/image/${relPath}`;
+                img.style.width = "100%";
+                img.style.aspectRatio = "4/3";
+                img.style.objectFit = "contain";
                 img.onclick = () => {
-                    if (typeof obj === 'string' || badge === "Search" || obj.sim_visual === undefined) {
-                        startAiFlow(relPath);
-                    } else {
-                        openXaiModal(relPath, obj.sim_visual, obj.sim_style, obj.sim_color);
-                    }
+                    startAiFlow(relPath);
                 };
 
+                // Favorite Heart Button (Small & Top Right)
                 const isFav = favorites.includes(relPath);
                 const heart = document.createElement("div");
                 heart.className = "heart-btn" + (isFav ? " active" : "");
+                heart.style.position = "absolute";
+                heart.style.top = "8px";
+                heart.style.right = "8px";
+                heart.style.width = "26px";
+                heart.style.height = "26px";
+                heart.style.fontSize = "14px";
+                heart.style.background = "white";
+                heart.style.borderRadius = "50%";
+                heart.style.display = "flex";
+                heart.style.alignItems = "center";
+                heart.style.justifyContent = "center";
+                heart.style.boxShadow = "0 2px 5px rgba(0,0,0,0.15)";
                 heart.style.color = isFav ? "#e74c3c" : "#ccc";
+                heart.style.cursor = "pointer";
                 heart.innerHTML = "❤️";
                 heart.onclick = (e) => {
                     e.stopPropagation();
@@ -435,66 +545,152 @@
 
                 imgContainer.appendChild(img);
                 imgContainer.appendChild(heart);
+                itemWrap.appendChild(imgContainer);
 
-                if (badge && badge !== "Search") {
+                // Card Body Information
+                const cardBody = document.createElement("div");
+                cardBody.style.padding = "12px 14px";
+                cardBody.style.display = "flex";
+                cardBody.style.flexDirection = "column";
+                cardBody.style.gap = "6px";
+
+                // Header row: Category and Badge
+                const headerRow = document.createElement("div");
+                headerRow.style.display = "flex";
+                headerRow.style.justifyContent = "space-between";
+                headerRow.style.alignItems = "center";
+                
+                const catText = document.createElement("span");
+                catText.innerText = category ? (category.charAt(0).toUpperCase() + category.slice(1)) : "Furniture";
+                catText.style.fontWeight = "bold";
+                catText.style.fontSize = "0.85rem";
+                catText.style.color = "#2d3436";
+                headerRow.appendChild(catText);
+
+                if (badge) {
                     const badgeEl = document.createElement("div");
                     badgeEl.innerText = badge;
-                    badgeEl.style.position = "absolute";
-                    badgeEl.style.top = "5px";
-                    badgeEl.style.left = "5px";
-                    badgeEl.style.background = badge === "Best Match" ? "#e17055" : (badge === "Color Match" ? "#e84393" : "#0984e3");
+                    let badgeBg = "#0984e3";
+                    if (badge === "Top ML Pick" || badge === "Top AI Pick") badgeBg = "#00b894";
+                    else if (badge === "Color Match") badgeBg = "#e17055";
+                    else if (badge === "ML Picked" || badge === "AI Pick") badgeBg = "#6c5ce7";
+                    badgeEl.style.background = badgeBg;
                     badgeEl.style.color = "white";
                     badgeEl.style.padding = "3px 6px";
-                    badgeEl.style.fontSize = "0.7rem";
-                    badgeEl.style.borderRadius = "4px";
+                    badgeEl.style.fontSize = "0.6rem";
+                    badgeEl.style.borderRadius = "6px";
                     badgeEl.style.fontWeight = "bold";
-                    badgeEl.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
-                    imgContainer.appendChild(badgeEl);
+                    headerRow.appendChild(badgeEl);
+                }
+                cardBody.appendChild(headerRow);
+
+                // Score Row
+                if (final_score !== null) {
+                    const scoreRow = document.createElement("div");
+                    scoreRow.style.display = "flex";
+                    scoreRow.style.alignItems = "center";
+                    scoreRow.style.gap = "6px";
+
+                    const scoreLabel = document.createElement("span");
+                    scoreLabel.innerText = `Score:`;
+                    scoreLabel.style.fontSize = "0.75rem";
+                    scoreLabel.style.color = "#636e72";
+
+                    const scoreVal = document.createElement("span");
+                    scoreVal.innerText = `${(final_score * 100).toFixed(0)}%`;
+                    scoreVal.style.fontSize = "0.85rem";
+                    scoreVal.style.fontWeight = "800";
+                    scoreVal.style.color = "#00b894";
+
+                    scoreRow.appendChild(scoreLabel);
+                    scoreRow.appendChild(scoreVal);
+                    cardBody.appendChild(scoreRow);
                 }
 
-                if (final_score) {
-                    const scoreEl = document.createElement("div");
-                    scoreEl.innerText = `AI Confidence: ${Math.round(final_score * 100)}%`;
-                    scoreEl.style.fontSize = "0.7rem";
-                    scoreEl.style.fontWeight = "bold";
-                    scoreEl.style.color = "#00b894";
-                    scoreEl.style.marginTop = "6px";
-                    scoreEl.style.textAlign = "center";
-                    itemWrap.appendChild(scoreEl);
+                // Action Buttons
+                const btnRow = document.createElement("div");
+                btnRow.style.display = "flex";
+                btnRow.style.gap = "8px";
+                btnRow.style.marginTop = "6px";
+
+                const placeBtn = document.createElement("button");
+                placeBtn.className = "btn";
+                placeBtn.style.flex = "1";
+                placeBtn.style.padding = "6px";
+                placeBtn.style.fontSize = "0.75rem";
+                placeBtn.innerText = "Place";
+                placeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    startAiFlow(relPath);
+                };
+                btnRow.appendChild(placeBtn);
+
+                if (typeof obj === 'object' && obj.visual_similarity !== undefined) {
+                    const whyBtn = document.createElement("button");
+                    whyBtn.className = "btn btn-secondary";
+                    whyBtn.style.flex = "1.5";
+                    whyBtn.style.padding = "6px";
+                    whyBtn.style.fontSize = "0.75rem";
+                    whyBtn.innerText = "Why Recommended?";
+                    whyBtn.title = "Why Recommended?";
+                    whyBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openXaiModal(obj);
+                    };
+                    btnRow.appendChild(whyBtn);
                 }
 
-                const explLabel = document.createElement("p");
-                explLabel.style.fontSize = "0.75rem";
-                explLabel.style.color = "#888";
-                explLabel.style.margin = "4px 0 0 0";
-                explLabel.style.textAlign = "center";
-                explLabel.style.lineHeight = "1.2";
-                explLabel.innerText = explanation;
-
-                // Important Append Order
-                itemWrap.insertBefore(imgContainer, itemWrap.firstChild);
-                itemWrap.appendChild(explLabel);
-
+                cardBody.appendChild(btnRow);
+                itemWrap.appendChild(cardBody);
                 container.appendChild(itemWrap);
+
+
             });
         }
 
-        // Modal Logic
+        // Modal Logic for Machine Learning Score Breakdown
         const xaiModal = document.getElementById("xaiModal");
         const loadingFlowModal = document.getElementById("loadingFlowModal");
-        let currentXaiItem = null;
+        let currentXaiItemPath = null;
 
-        function openXaiModal(relPath, v, s, c) {
-            currentXaiItem = relPath;
+        function openXaiModal(scoreData) {
+            currentXaiItemPath = scoreData.item;
 
-            document.getElementById("xai-vis").innerText = Math.round(v * 100) + "%";
-            document.getElementById("xai-vis-bar").style.width = Math.round(v * 100) + "%";
+            const vis = scoreData.visual_similarity !== undefined ? scoreData.visual_similarity : 0.0;
+            const color = scoreData.color_compatibility !== undefined ? scoreData.color_compatibility : 0.0;
+            const coldist = scoreData.color_distribution !== undefined ? scoreData.color_distribution : 0.0;
+            const bright = scoreData.brightness_match !== undefined ? scoreData.brightness_match : 0.0;
+            const texture = scoreData.texture_similarity !== undefined ? scoreData.texture_similarity : 0.0;
+            const shape = scoreData.shape_similarity !== undefined ? scoreData.shape_similarity : 0.0;
+            const category = scoreData.category_relevance !== undefined ? scoreData.category_relevance : 0.0;
+            const style = scoreData.style_feature !== undefined ? scoreData.style_feature : 0.0;
+            const final_score = scoreData.final_score !== undefined ? scoreData.final_score : 0.0;
 
-            document.getElementById("xai-style").innerText = Math.round(s * 100) + "%";
-            document.getElementById("xai-style-bar").style.width = Math.round(s * 100) + "%";
+            document.getElementById("xai-vis").innerText = `${vis.toFixed(2)} (${Math.round(vis * 100)}%)`;
+            document.getElementById("xai-vis-bar").style.width = Math.round(vis * 100) + "%";
 
-            document.getElementById("xai-color").innerText = Math.round(c * 100) + "%";
-            document.getElementById("xai-color-bar").style.width = Math.round(c * 100) + "%";
+            document.getElementById("xai-color").innerText = `${color.toFixed(2)} (${Math.round(color * 100)}%)`;
+            document.getElementById("xai-color-bar").style.width = Math.round(color * 100) + "%";
+
+            document.getElementById("xai-coldist").innerText = `${coldist.toFixed(2)} (${Math.round(coldist * 100)}%)`;
+            document.getElementById("xai-coldist-bar").style.width = Math.round(coldist * 100) + "%";
+
+            document.getElementById("xai-bright").innerText = `${bright.toFixed(2)} (${Math.round(bright * 100)}%)`;
+            document.getElementById("xai-bright-bar").style.width = Math.round(bright * 100) + "%";
+
+            document.getElementById("xai-texture").innerText = `${texture.toFixed(2)} (${Math.round(texture * 100)}%)`;
+            document.getElementById("xai-texture-bar").style.width = Math.round(texture * 100) + "%";
+
+            document.getElementById("xai-shape").innerText = `${shape.toFixed(2)} (${Math.round(shape * 100)}%)`;
+            document.getElementById("xai-shape-bar").style.width = Math.round(shape * 100) + "%";
+
+            document.getElementById("xai-category").innerText = `${category.toFixed(2)} (${Math.round(category * 100)}%)`;
+            document.getElementById("xai-category-bar").style.width = Math.round(category * 100) + "%";
+
+            document.getElementById("xai-style").innerText = `${style.toFixed(2)} (${Math.round(style * 100)}%)`;
+            document.getElementById("xai-style-bar").style.width = Math.round(style * 100) + "%";
+
+            document.getElementById("xai-final").innerText = `${final_score.toFixed(2)} (${Math.round(final_score * 100)}%)`;
 
             xaiModal.style.display = "flex";
         }
@@ -505,15 +701,17 @@
 
         function applyXaiItem() {
             closeXaiModal();
-            startAiFlow(currentXaiItem);
+            if (currentXaiItemPath) {
+                startAiFlow(currentXaiItemPath);
+            }
         }
 
-        // Place and Remove Background Logic
+        // Furniture Placement & Background Removal Flow
         let pendingAiUrl = null;
 
         function startAiFlow(filename) {
             if (!roomBg.src) {
-                alert("Please upload a room photo first.");
+                alert("Please upload a room photo first to place furniture.");
                 return;
             }
 
@@ -524,9 +722,9 @@
             const placeBtn = document.getElementById("flow-place-btn");
 
             placeBtn.style.display = "none";
-            msg1.style.color = "#6c5ce7"; msg1.innerText = "⏳ Analyzing object...";
-            msg2.style.color = "#aaa"; msg2.innerText = "⏳ Removing background using AI model...";
-            msg3.style.color = "#aaa"; msg3.innerText = "⏳ Optimizing placement...";
+            msg1.style.color = "#6c5ce7"; msg1.innerText = "⏳ Analyzing furniture object...";
+            msg2.style.color = "#aaa"; msg2.innerText = "⏳ Removing background using U²-Net model...";
+            msg3.style.color = "#aaa"; msg3.innerText = "⏳ Preparing canvas placement...";
 
             setTimeout(() => {
                 msg1.innerText = "✅ Object analyzed";
@@ -546,21 +744,21 @@
                                 msg3.innerText = "✅ Placement ready";
                                 pendingAiUrl = URL.createObjectURL(blob);
                                 placeBtn.style.display = "block";
-                            }, 1500); // extra 1.5s delay
-                        }, 1500); // padding for fast requests
+                            }, 800);
+                        }, 800);
                     })
                     .catch(err => {
                         setTimeout(() => {
-                            msg2.innerText = "⚠️ Model bypassed (using original)";
+                            msg2.innerText = "⚠️ Background removal bypassed (using original)";
                             msg3.style.color = "#6c5ce7";
                             setTimeout(() => {
                                 msg3.innerText = "✅ Placement ready";
                                 pendingAiUrl = `http://127.0.0.1:5050/image/${filename}`;
                                 placeBtn.style.display = "block";
-                            }, 1500);
-                        }, 1500);
+                            }, 800);
+                        }, 800);
                     });
-            }, 1000); // 1.0s analyzing delay
+            }, 600);
         }
 
         function finishAiFlow() {
@@ -571,7 +769,7 @@
             }
         }
 
-        // Wall Panel Tool
+        // Interactive Wall Panel Creator
         function addWallPanel() {
             const wall = document.createElement("div");
             wall.className = "furniture-item wall-panel";
@@ -579,7 +777,7 @@
             wall.style.height = "200px";
             wall.style.left = "50px";
             wall.style.top = "50px";
-            wall.style.backgroundColor = "#d2b48c"; // Classic beige
+            wall.style.backgroundColor = "#d2b48c";
 
             wall.dataset.rotation = 0;
             wall.dataset.flipX = 1;
@@ -598,6 +796,7 @@
             selectItem(wall);
         }
 
+        // Furniture Element Placement on Canvas
         function createFurnitureItem(url) {
             const item = document.createElement("div");
             item.className = "furniture-item";
@@ -635,16 +834,16 @@
             selectItem(item);
         }
 
-        // Export Design Feature
+        // Export Canvas Design to Image
         function exportDesign() {
-            if (!roomBg.src) return alert("Nothing to export yet!");
+            if (!roomBg.src) return alert("Please upload a room photo first!");
 
             mainLoader.style.display = "inline-block";
             html2canvas(roomContainer, {
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: null,
-                scale: 2 // High resolution
+                scale: 2
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `VisionHome-Design-${Date.now()}.png`;
@@ -686,12 +885,10 @@
             const panel = document.getElementById("contextual-panel");
             panel.style.display = "block";
 
-            // Sync rotation slider
             const rot = selectedItem.dataset.rotation || 0;
             document.getElementById("item-rotation").value = rot;
             document.getElementById("rot-val").innerText = rot + "°";
 
-            // Sync Flip buttons
             const flipX = selectedItem.dataset.flipX || 1;
             const flipY = selectedItem.dataset.flipY || 1;
             const btnX = document.getElementById("btn-flip-x");
@@ -705,13 +902,11 @@
                 btnY.style.flex = "1"; btnY.style.padding = "0.5rem";
             }
 
-            // Sync Texture
             document.querySelectorAll('.tex-panel-btn').forEach(b => b.classList.remove('active'));
             const tex = ['velvet', 'leather', 'boucle'].find(t => selectedItem.classList.contains(t)) || 'none';
             const texBtn = document.querySelector(`.tex-panel-btn[onclick*="${tex}"]`);
             if (texBtn) texBtn.classList.add('active');
 
-            // Sync color
             document.querySelectorAll('#panel-color .swatch').forEach(sw => sw.classList.remove('active'));
             const cName = selectedItem.dataset.colorName || 'none';
             const colorBtn = document.querySelector(`#panel-color .swatch.${cName}`);
@@ -779,11 +974,10 @@
             if (img) {
                 img.style.filter = filterStr;
             } else if (selectedItem.classList.contains('wall-panel')) {
-                // walls just change background
                 if (name !== 'none') {
                     selectedItem.style.backgroundColor = event.target.style.backgroundColor;
                 } else {
-                    selectedItem.style.backgroundColor = "#d2b48c"; // Reset to default
+                    selectedItem.style.backgroundColor = "#d2b48c";
                 }
             }
         }
@@ -830,7 +1024,7 @@
                     }
                     if (resizeType === 'h' || resizeType === 'all') {
                         item.style.height = Math.max(50, startH + dy) + "px";
-                        item.querySelector('img').style.height = "100%"; // Scale img if height is forced
+                        item.querySelector('img').style.height = "100%";
                     }
                 }
             }

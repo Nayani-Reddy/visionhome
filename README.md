@@ -1,86 +1,98 @@
-# VisionHome Project
+# VisionHome – Intelligent Interior Design & Furniture Recommendation System
 
-VisionHome is an innovative application that allows users to visualize and design their living spaces by uploading images of empty rooms and selecting furniture or items to place within those spaces. The application utilizes AI to generate related images and provides recommendations for real-world items available for purchase.
+VisionHome is a state-of-the-art, machine learning-driven web application that allows users to seamlessly design interior spaces. Users can upload a photo of an empty room, receive automated AI-driven furniture recommendations, dynamically place objects in the room (with automatic background removal), and tweak contextual parameters like color, texture, and rotation. 
 
-## Features
+The core feature of VisionHome is its highly sophisticated, 8-parameter **Machine Learning Recommendation Engine** backed by Explainable AI (XAI) principles.
 
-- **Image Upload**: Users can upload images of empty rooms such as living rooms, bedrooms, kitchens, and gardens.
-- **Item Selection**: Users can describe the furniture or items they wish to add (e.g., luxury green velvet sofa) and specify where to place them in the image.
-- **AI Image Generation**: The application generates related images based on user input, allowing users to choose their preferred item.
-- **Canvas Editor**: Users can visualize their designs on a canvas where they can place selected items.
-- **Day/Night Slider**: A feature that allows users to toggle between day and night views of their designs, making the visualization more dynamic.
-- **Recommendation Panel**: The application recommends real-world items from platforms like Amazon based on user selections.
+---
 
-## Project Structure
+## 🏗 System Architecture Overview
 
-The project is divided into two main parts: the frontend and the backend.
+The system is separated into a lightweight frontend (Vanilla HTML/CSS/JS) and a robust Python-based backend (Flask) handling heavy Machine Learning and Computer Vision tasks.
 
-### Frontend
+### 1. Frontend (User Interface)
+- **Stack:** Vanilla HTML5, CSS3, JavaScript.
+- **Design Philosophy:** A spacious, responsive layout prioritizing the visual aspects of furniture discovery. The application uses a dynamic grid system (3-4 items on desktop) preventing duplicate items.
+- **Features:**
+  - **Interactive Canvas Editor:** Move, rotate, scale, and manipulate furniture layers. Contextual editing panels to modify colors, saturation, and apply texture overlays (Velvet, Leather, Boucle).
+  - **Dynamic Lighting Simulation:** Apply realistic overlay masks simulating daylight, warm light, moon light, and sunset.
+  - **XAI Modals:** Transparent, user-friendly modals rendering real-time progress bars and score breakdowns explaining exactly *why* an item was recommended.
+  - **Exporting:** Integrated `html2canvas` for downloading final designs.
 
-- **React Application**: Built using TypeScript, the frontend handles user interactions and visualizations.
-- **Components**: Includes components for uploading images, editing the canvas, generating items, and displaying recommendations.
-- **Services**: Contains API calls to the backend for image processing and recommendations.
+### 2. Backend (Flask Server)
+- **Stack:** Python, Flask, Flask-CORS.
+- **Image Processing Engine:** OpenCV (`cv2`), `scikit-image`.
+- **Deep Learning/ML:** TensorFlow/Keras (`ResNet50`), `scikit-learn` (K-Means).
+- **Background Removal pipeline:** `rembg` (U²-Net architecture).
+- **Core Endpoints:**
+  - `/ai-recommend`: Accepts a room image upload, extracts 8 sets of features, and calculates weighted recommendation scores against the entire dataset.
+  - `/recommend`: Text-based keyword filtering followed by ML parameter ranking.
+  - `/prepare`: Real-time AI background removal pipeline generating transparent `.png` buffers for seamless canvas placement.
+  - `/image/<filename>`: Static asset serving.
 
-### Backend
+---
 
-- **Express Server**: The backend is built using Node.js and Express, handling image uploads and AI functionalities.
-- **Controllers**: Manages the logic for uploading images, generating AI images, and providing recommendations.
-- **Services**: Contains functions for interacting with AI models and fetching real-world item recommendations.
+## 🧠 Machine Learning & AI Core
 
-## Setup Instructions
+VisionHome moves beyond simple keyword matching by implementing a robust, multi-parameter scoring algorithm. Every furniture item is ranked out of 100% based on the following weighted criteria:
 
-1. **Clone the Repository**: 
-   ```
-   git clone <repository-url>
-   cd visionhome
-   ```
+1. **Visual Feature Similarity (40% - Deep Learning)**
+   - Utilizes a pre-trained **ResNet50** Convolutional Neural Network (CNN) as a feature extractor.
+   - The top classification layer is removed, generating a **2048-dimensional embedding vector**.
+   - The system calculates the cosine similarity between the uploaded room image vector and the dataset furniture vectors.
+   
+2. **Color Compatibility (15% - Unsupervised ML)**
+   - Implements **K-Means Clustering** (where k=3) on the image's RGB pixel space to mathematically extract the dominant color palette centroids.
+   - Calculates the minimum Euclidean distance between the room's dominant colors and the furniture's dominant colors.
 
-2. **Install Dependencies**:
-   - For the frontend:
-     ```
-     cd frontend
-     npm install
-     ```
-   - For the backend:
-     ```
-     cd backend
-     npm install
-     ```
+3. **Color Distribution Similarity (10% - Computer Vision)**
+   - Extracts a normalized 2D **HSV (Hue-Saturation-Value) Histogram** (8x8 bins).
+   - Computes the intersection of histograms between the room and the item.
 
-3. **Environment Variables**:
-   - Copy the `.env.example` file to `.env` and fill in the required variables.
+4. **Brightness Compatibility (10%)**
+   - Extracts grayscale mean intensity (0.0 to 1.0) and penalizes items that drastically differ from the ambient lighting of the uploaded room.
 
-4. **Run the Application**:
-   - To run the frontend:
-     ```
-     cd frontend
-     npm start
-     ```
-   - To run the backend:
-     ```
-     cd backend
-     npm run start
-     ```
+5. **Texture Similarity (10% - Computer Vision)**
+   - Extracts a micro-texture descriptor using **LBP (Local Binary Pattern)**.
+   - Generates a 10-bin uniform histogram of textures and calculates the histogram intersection to ensure, for example, heavily textured rooms are matched with appropriately textured furniture.
 
-5. **Docker Setup** (optional):
-   - If you prefer to run the application using Docker, use the following command:
-     ```
-     docker-compose up
-     ```
+6. **Shape/Edge Similarity (5%)**
+   - Applies a **Canny Edge Detector** to calculate edge density and structural complexity.
+   - Generates an 8-bin orientation histogram using Sobel derivatives to match structural flow (e.g., matching sharp geometric rooms with angular furniture).
 
-## Usage
+7. **Visual Style Feature (5%)**
+   - An encoded heuristic vector combining normalized brightness, contrast, saturation, and texture variance.
 
-- Open the application in your web browser.
-- Upload an image of an empty room.
-- Describe the items you want to add and select their placement.
-- View the generated images and choose your preferred option.
-- Use the day/night slider to see your design in different lighting.
-- Check the recommendation panel for real-world items you can purchase.
+8. **Category Relevance (5%)**
+   - A metadata-driven check to maintain logical parsing.
 
-## Contributing
+*(Note: In order to preserve rapid frontend performance, dataset metadata is pre-computed and stored in `dataset_metadata.pkl` using the `precompute_ml_features.py` pipeline.)*
 
-Contributions are welcome! Please submit a pull request or open an issue for any suggestions or improvements.
+---
 
-## License
+## 📊 Explainable AI (XAI)
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+A critical component of VisionHome is its transparency. Often, recommendation systems act as "black boxes." VisionHome breaks this paradigm by offering an **XAI — Explainable Recommendations** flow. 
+
+When a user clicks "Why Recommended?" on any furniture card, the frontend queries the exact mathematical breakdown of the 8 parameters described above. It exposes the ResNet50 similarity scores, the K-Means color distance, and all localized CV metrics in easy-to-read progress bars, ensuring users understand that recommendations are grounded in complex mathematical relationships, not random assignments.
+
+---
+
+## 🚀 How to Run Locally
+
+Start the Backend and Frontend servers simultaneously in two separate terminals.
+
+**Terminal 1 (Backend):**
+```bash
+cd flask_backend
+source venv/bin/activate  # (If using a virtual environment)
+python app.py
+```
+*(Server will start on http://127.0.0.1:5050)*
+
+**Terminal 2 (Frontend):**
+```bash
+cd frontend
+python -m http.server 8000
+```
+*(Application will be available at http://127.0.0.1:8000)*
